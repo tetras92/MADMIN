@@ -79,8 +79,9 @@ class Configuration:
                 else:
                     s += "* "
             s += "\n"
+        s += "="*(self.Y * 2)
+        s += "\n"
         return s
 
     def show(self):
-
         print(self)

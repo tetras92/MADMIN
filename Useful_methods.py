@@ -18,7 +18,6 @@ def generate_position_cells_t(n,m,prop_cells_type):
         L[i] = [ "B" for j in range(m)]
         
     coordonnees = [ (i,j) for j in range(m) for i in range(n)  if not(i==0 and j==0) and not(i==n-1 and j==m-1) ]
-
     for t_cell,nb_t in prop_cells_type.items():
         if((t_cell != 'T')) :
             cpt = nb_t

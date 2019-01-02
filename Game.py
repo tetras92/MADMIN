@@ -39,9 +39,10 @@ class Game:
             state = self.config.get_mdp_state()
             action = policy_dict[state]
             # print (action)
+            G.show()
             self.config.Adventurer.move(action)
             time.sleep(2)
-            G.show()
+
 
     def is_winnable(self):
         DD_tab = [[0 for j in range(self.config.Y)] for i in range(self.config.X)]
@@ -109,8 +110,10 @@ if __name__ == '__main__':
     # G = Game.random_generation(10, 10, "HARD")
     G = Game("example_grid")       #toujours un espace avant retour a la ligne
     policy = G.mdp.run_linear_programming_resolution()
-    # G.mdp.run_value_iteration(0.01)
-    G.play_with_policy(policy)
+    if G.is_winnable():
+    #     print(" WINNABLE ")
+        policy = G.mdp.run_value_iteration(0.01)
+        G.play_with_policy(policy)
     # if G.is_winnable():
     #     print(" WINNABLE ")
     # else:

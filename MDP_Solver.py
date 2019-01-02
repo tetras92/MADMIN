@@ -142,7 +142,7 @@ class MDP_Solver():
                 States_best_actions_Table[state] = best_action #.append(best_action)
             i += 1
         #calcul of optimal policy
-        print States_best_actions_Table
+        # print (States_best_actions_Table)
         return States_best_actions_Table
         # for state, action in States_best_actions_Table.items():
         #     x, y = action
