@@ -57,18 +57,18 @@ class MDP_Solver():
             reward = -5
             return [((self.config.start_position, has_sword, has_key, has_treasure), 1.)], reward
         elif isinstance(case_element, P):
-            reward = 2#0
+            reward = 0
             list_of_non_wall_cells = self.config.Dungeon.list_of_non_wall_cells()
             return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_non_wall_cells)) for dest_pos in list_of_non_wall_cells], reward
         elif isinstance(case_element, MP):
-            reward = 2#1
+            reward = 1
             list_of_neighbouring_cells = self.config.Dungeon.list_of_neighbouring_cells((from_x, from_y))
             return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_neighbouring_cells)) for dest_pos in list_of_neighbouring_cells], reward
         elif isinstance(case_element, R):
             if has_treasure:
                 reward = 3
             else:
-                reward = 3#0
+                reward = 0
             return  [((self.config.start_position, has_sword, has_key, has_treasure), 0.4),
                      (((from_x, from_y), has_sword, has_key, has_treasure), 0.6)], reward
         elif isinstance(case_element, T):
@@ -76,7 +76,7 @@ class MDP_Solver():
                 reward = 0
                 return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
             elif has_key:
-                reward = 10
+                reward = 100
                 return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
             else:
                 reward = 0
