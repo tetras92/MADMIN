@@ -1,6 +1,6 @@
 from Action import *
 from Case_Objects import *
-from gurobipy import *
+# from gurobipy import *
 
 
 class MDP_Solver():
@@ -43,11 +43,11 @@ class MDP_Solver():
             if has_treasure :
                 reward = 10
             else:
-                reward = -1
+                reward = -5#-1
             return [((self.config.start_position, has_sword, has_key, has_treasure), 1.)], reward
         elif isinstance(case_element, E):
             if not has_sword:
-                reward = -1
+                reward = 2#-1
                 return  [((self.config.start_position, has_sword, has_key, has_treasure), 0.3),
                          (((from_x, from_y), has_sword, has_key, has_treasure), 0.7)], reward
             else:
@@ -61,7 +61,7 @@ class MDP_Solver():
             list_of_non_wall_cells = self.config.Dungeon.list_of_non_wall_cells()
             return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_non_wall_cells)) for dest_pos in list_of_non_wall_cells], reward
         elif isinstance(case_element, MP):
-            reward = 2#1
+            reward = 3#1
             list_of_neighbouring_cells = self.config.Dungeon.list_of_neighbouring_cells((from_x, from_y))
             return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_neighbouring_cells)) for dest_pos in list_of_neighbouring_cells], reward
         elif isinstance(case_element, R):
@@ -79,11 +79,11 @@ class MDP_Solver():
                 reward = 10
                 return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
             else:
-                reward = 0
+                reward = -5#0
                 return [(((from_x, from_y), has_sword, has_key,  has_treasure), 1.)], reward
         elif isinstance(case_element, S):
             if has_sword:
-                reward = 3
+                reward = 5#3
             else:
                 reward = 5
             return [(((from_x, from_y), True, has_key, has_treasure), 1.)], reward
@@ -115,6 +115,62 @@ class MDP_Solver():
             s += str(associated_set)
             s += "\n"
         return s
+
+    def print_policy(self,policy):
+        xS = [ [ None for j in range(self.config.Y)] for i in range(self.config.X) ]
+        xK = [ [ None for j in range(self.config.Y)] for i in range(self.config.X) ]
+        xSK = [ [ None for j in range(self.config.Y)] for i in range(self.config.X) ]
+        xKT = [ [ None for j in range(self.config.Y)] for i in range(self.config.X) ]
+        xSKT = [ [ None for j in range(self.config.Y)] for i in range(self.config.X) ]
+        xNone = [ [ None for j in range(self.config.Y)] for i in range(self.config.X) ]
+
+        for state,action in policy.items():
+            (i,j),S,K,T = state
+            if S :
+                if not K:
+                    xS[i][j] = action
+                elif K :
+                    if not T :
+                      xSK[i][j] = action
+                    else :
+                        xSKT[i][j] = action
+            elif K :
+                if not T:
+                    xK[i][j] = action
+                else :
+                    xKT[i][j] = action
+            else :
+                xNone[i][j] = action
+
+        def printing(x):
+            line = ""
+            s = ""
+            for i in range(len(x)) :
+                s += "\n | "
+                for j in range(len(x[i])) :
+                    if x[i][j] == Action.RIGHT :
+                        s += ">"
+                    elif x[i][j] == Action.LEFT :
+                        s += "<"
+                    elif x[i][j] == Action.UP :
+                        s += "^"
+                    else :
+                        s += "v"
+                    s += " | "
+            print(s)
+
+        print(" \n ********* Policy when nothing : *********")
+        printing(xNone)
+        print(" \n ********* Policy when S : *********")
+        printing(xS)
+        print(" \n ********* Policy when K : *********")
+        printing(xK)
+        print(" \n ********* Policy when SK : *********")
+        printing(xSK)
+        print(" \n ********* Policy when KT : *********")
+        printing(xKT)
+        print(" \n ********* Policy when SKT : *********")
+        printing(xSKT)
 
     def run_value_iteration(self, epsilon):
         max_dif_i = 100 # never choose epsilo > 100
@@ -149,57 +205,57 @@ class MDP_Solver():
         #     print (state, (x, y))
 
 
-    def run_linear_programming_resolution(self):
-        m = Model("MADI")
-        #initialization
-        #Dict correspondance state --> num variable
-        State2varnumDict = dict()
-        num = 0
-        x = list()   #liste des objets variables gurobi
-        for state in self.StatesDict:
-            State2varnumDict[state] = num
-            # x.append(m.addVar(name="x%d"%num))
-            x.append(m.addVar(vtype=GRB.CONTINUOUS, lb=-GRB.INFINITY, name="x_%d"%num))
-            # une variable par etat
-            m.update()
-            num += 1
-        m.update()
-        #les contraintes
-        for state in self.StatesDict:
-            for action, Set_of_couple_of_dest_stat_proba in self.StatesDict[state].items():
-                c = LinExpr()
-                c += x[State2varnumDict[state]]
-                for dest_stat, proba in Set_of_couple_of_dest_stat_proba:
-                    c -= 0.9*proba*x[State2varnumDict[dest_stat]]
-                    # print(c)
-                cst = m.addConstr(c >= self.Reward_tab[state][action], "Cstr state {} action {}".format(state, action))
-                m.update()
-                # print(cst)
-        m.update()
-        #l'objectif
-        obj = LinExpr()
-
-        for i in range(len(x)):
-            obj += x[i]
-        m.setObjective(obj, GRB.MINIMIZE)
-        m.update()
-        print(obj)
-        m.optimize()
-
-        # Politique
-        States_best_actions_Table = {state : None for state in self.StatesDict}
-        for state in self.StatesDict:
-            best_action = None
-            best_value = 0
-            for action, Set_of_couple_of_dest_stat_proba in self.StatesDict[state].items():
-                state_action_value = self.Reward_tab[state][action]
-                for dest_stat, proba in Set_of_couple_of_dest_stat_proba:
-                    state_action_value += 0.9 * proba * x[State2varnumDict[dest_stat]].x
-                if best_action == None or state_action_value > best_value:
-                    best_action = action
-                    best_value = state_action_value
-            States_best_actions_Table[state] = best_action
-        print(States_best_actions_Table)
-        return States_best_actions_Table
+    # def run_linear_programming_resolution(self):
+    #     m = Model("MADI")
+    #     #initialization
+    #     #Dict correspondance state --> num variable
+    #     State2varnumDict = dict()
+    #     num = 0
+    #     x = list()   #liste des objets variables gurobi
+    #     for state in self.StatesDict:
+    #         State2varnumDict[state] = num
+    #         # x.append(m.addVar(name="x%d"%num))
+    #         x.append(m.addVar(vtype=GRB.CONTINUOUS, lb=-GRB.INFINITY, name="x_%d"%num))
+    #         # une variable par etat
+    #         m.update()
+    #         num += 1
+    #     m.update()
+    #     #les contraintes
+    #     for state in self.StatesDict:
+    #         for action, Set_of_couple_of_dest_stat_proba in self.StatesDict[state].items():
+    #             c = LinExpr()
+    #             c += x[State2varnumDict[state]]
+    #             for dest_stat, proba in Set_of_couple_of_dest_stat_proba:
+    #                 c -= 0.9*proba*x[State2varnumDict[dest_stat]]
+    #                 # print(c)
+    #             cst = m.addConstr(c >= self.Reward_tab[state][action], "Cstr state {} action {}".format(state, action))
+    #             m.update()
+    #             # print(cst)
+    #     m.update()
+    #     #l'objectif
+    #     obj = LinExpr()
+    #
+    #     for i in range(len(x)):
+    #         obj += x[i]
+    #     m.setObjective(obj, GRB.MINIMIZE)
+    #     m.update()
+    #     print(obj)
+    #     m.optimize()
+    #
+    #     # Politique
+    #     States_best_actions_Table = {state : None for state in self.StatesDict}
+    #     for state in self.StatesDict:
+    #         best_action = None
+    #         best_value = 0
+    #         for action, Set_of_couple_of_dest_stat_proba in self.StatesDict[state].items():
+    #             state_action_value = self.Reward_tab[state][action]
+    #             for dest_stat, proba in Set_of_couple_of_dest_stat_proba:
+    #                 state_action_value += 0.9 * proba * x[State2varnumDict[dest_stat]].x
+    #             if best_action == None or state_action_value > best_value:
+    #                 best_action = action
+    #                 best_value = state_action_value
+    #         States_best_actions_Table[state] = best_action
+    #     print(States_best_actions_Table)
+    #     return States_best_actions_Table
 
 

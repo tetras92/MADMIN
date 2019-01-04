@@ -5,6 +5,7 @@ from MDP_Solver import MDP_Solver
 from Useful_methods import *
 import os
 #from getch import getch
+
 import time
 
 class Game:
@@ -107,12 +108,13 @@ class Game:
         return Game(".game")
 
 if __name__ == '__main__':
-    # G = Game.random_generation(10, 10, "HARD")
-    G = Game("example_grid")       #toujours un espace avant retour a la ligne
-    policy = G.mdp.run_linear_programming_resolution()
+    # G = Game.random_generation(10, 10, "EASY")
+    G = Game(".game")#example_grid")       #toujours un espace avant retour a la ligne
+    # policy = G.mdp.run_linear_programming_resolution()
     if G.is_winnable():
     #     print(" WINNABLE ")
         policy = G.mdp.run_value_iteration(0.01)
+        G.mdp.print_policy(policy)
         G.play_with_policy(policy)
     # if G.is_winnable():
     #     print(" WINNABLE ")
