@@ -12,6 +12,7 @@ class Game:
     def __init__(self, filename):
         self.config = self.load_game(filename)
         self.mdp = MDP_Solver(self.config)
+
     def play(self):
         while not self.has_won():
             G.show()
@@ -35,11 +36,10 @@ class Game:
 
     def play_with_policy(self, policy_dict):
         while not self.has_won():
-            # G.show()
+            self.show()
             state = self.config.get_mdp_state()
             action = policy_dict[state]
             # print (action)
-            G.show()
             self.config.Adventurer.move(action)
             time.sleep(2)
 
@@ -94,7 +94,7 @@ class Game:
         self.config.show()
 
     @staticmethod
-    def random_generation(n, m, level="EASY"):
+    def random_generation(n, m, level="HARD"):
         D = dict()
         with open(level, "r") as file:
             for line in file:
@@ -104,15 +104,19 @@ class Game:
                 nb = int(prop * n * m)
                 D[case_type] = nb
         generate_file_game(generate_position_cells_t(n, m, D))
+        print("end .game")
         return Game(".game")
 
 if __name__ == '__main__':
-    # G = Game.random_generation(10, 10, "HARD")
-    G = Game("example_grid")       #toujours un espace avant retour a la ligne
-    policy = G.mdp.run_linear_programming_resolution()
+    G = Game.random_generation(10, 10, "EASY")
+    # G = Game("example_grid")       #toujours un espace avant retour a la ligne
+    policy = G.mdp.run_value_iteration(0.01)
+    # policy = G.mdp.run_linear_programming_resolution()
+
+
     if G.is_winnable():
     #     print(" WINNABLE ")
-        policy = G.mdp.run_value_iteration(0.01)
+    #
         G.play_with_policy(policy)
     # if G.is_winnable():
     #     print(" WINNABLE ")

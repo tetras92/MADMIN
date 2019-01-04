@@ -34,7 +34,7 @@ class MDP_Solver():
                             self.StatesDict[state][action] = set()
                         self.StatesDict[state][action].add((etat_destination, proba))
 
-        # print(self)
+        print("end mdp solver")
 
     def list_of_dest_position_proba_and_rewards(self, from_x, from_y, has_sword, has_key, has_treasure):
         case_element = self.config.Dungeon.grid[from_x][from_y]
