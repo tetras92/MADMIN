@@ -31,7 +31,6 @@ class Dungeon:
                 L.append((x+dx, y+dy))
         return L
 
-
     def remove_element(self, element):
         for i in range(self.size_x):
             for j in range(self.size_y):

@@ -34,7 +34,7 @@ class MDP_Solver():
                             self.StatesDict[state][action] = set()
                         self.StatesDict[state][action].add((etat_destination, proba))
 
-        print("end mdp solver")
+        # print("end mdp solver")
 
     def list_of_dest_position_proba_and_rewards(self, from_x, from_y, has_sword, has_key, has_treasure):
         case_element = self.config.Dungeon.grid[from_x][from_y]
@@ -107,7 +107,6 @@ class MDP_Solver():
         #     print("Error")
         #     exit(1001)
 
-
     def __str__(self):
         s = ""
         for state, associated_set in self.StatesDict.items():
@@ -143,11 +142,7 @@ class MDP_Solver():
                 States_best_actions_Table[state] = best_action #.append(best_action)
             i += 1
         #calcul of optimal policy
-        # print (States_best_actions_Table)
         return States_best_actions_Table
-        # for state, action in States_best_actions_Table.items():
-        #     x, y = action
-        #     print (state, (x, y))
 
 
     # def run_linear_programming_resolution(self):
@@ -184,7 +179,7 @@ class MDP_Solver():
     #         obj += x[i]
     #     m.setObjective(obj, GRB.MINIMIZE)
     #     m.update()
-    #     print(obj)
+    #     # print(obj)
     #     m.optimize()
     #
     #     # Politique
@@ -200,7 +195,7 @@ class MDP_Solver():
     #                 best_action = action
     #                 best_value = state_action_value
     #         States_best_actions_Table[state] = best_action
-    #     print(States_best_actions_Table)
+    #     # print(States_best_actions_Table)
     #     return States_best_actions_Table
 
 

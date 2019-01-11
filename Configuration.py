@@ -24,7 +24,7 @@ class Configuration:
 
         self.Adventurer = Adventurer(self)
 
-        print("end config")
+        # print("end config")
 
     def reset(self):
         self.Adventurer.position = self.start_position
@@ -49,12 +49,10 @@ class Configuration:
     def get_state(self):
         return (self.Adventurer.position, self.Adventurer.has_sword, self.Adventurer.has_key, self.Adventurer.has_treasure)
 
-
     state = property(fget=get_state)
 
     def get_adventurer_position(self):
         return self.Adventurer.position
-
 
     def move_adventurer_to_non_wall_cell(self):
         #L : list of non-wall cells
@@ -64,7 +62,7 @@ class Configuration:
         return True
 
     def move_adventurer_to_neighbouring_cell(self):
-        cell_x, cell_y = self.Adventurer.position
+        # cell_x, cell_y = self.Adventurer.position
         #L : list of neighbouring cells
         L = self.Dungeon.list_of_neighbouring_cells(self.Adventurer.position)
         self.Adventurer.position = L[random.randint(0, len(L)-1)]

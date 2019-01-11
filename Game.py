@@ -30,7 +30,7 @@ class Game:
                 self.config.Adventurer.move(Action.RIGHT)
             else:
                 print("Error")
-            time.sleep(2)
+            time.sleep(3)
 
             G.show()
 
@@ -41,8 +41,7 @@ class Game:
             action = policy_dict[state]
             # print (action)
             self.config.Adventurer.move(action)
-            time.sleep(2)
-
+            time.sleep(3)
 
     def is_winnable(self):
         DD_tab = [[0 for j in range(self.config.Y)] for i in range(self.config.X)]
@@ -79,7 +78,6 @@ class Game:
 
         return key_reachable and DD_tab[t_x][t_y] != 0
 
-
     def load_game(self,filename):
         return Configuration(filename)
         
@@ -104,21 +102,16 @@ class Game:
                 nb = int(prop * n * m)
                 D[case_type] = nb
         generate_file_game(generate_position_cells_t(n, m, D))
-        print("end .game")
+        # print("end .game")
         return Game(".game")
 
 if __name__ == '__main__':
-    G = Game.random_generation(10, 10, "EASY")
-    # G = Game("example_grid")       #toujours un espace avant retour a la ligne
+    # G = Game.random_generation(10, 10, "EASY")
+    G = Game("example_grid")       #toujours un espace avant retour a la ligne
+
     policy = G.mdp.run_value_iteration(0.01)
     # policy = G.mdp.run_linear_programming_resolution()
+    print_policy(policy, G.config.X, G.config.Y)
 
-
-    if G.is_winnable():
-    #     print(" WINNABLE ")
-    #
-        G.play_with_policy(policy)
     # if G.is_winnable():
-    #     print(" WINNABLE ")
-    # else:
-    #     print(" NO SOLUTION")
+    #     G.play_with_policy(policy)
