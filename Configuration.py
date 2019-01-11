@@ -5,6 +5,7 @@ from Adventurer import Adventurer
 class Configuration:
 
     def __init__(self, filename):
+        self.filename = filename
         with open(filename) as file:
             line = file.readline()
             dimL = line.split(" ")
@@ -22,6 +23,34 @@ class Configuration:
                     self.add_element(elmnt, i, j)
 
         self.Adventurer = Adventurer(self)
+
+        print("end config")
+
+    def reset(self):
+        self.Adventurer.position = self.start_position
+        with open(self.filename) as file:
+            line = file.readline()
+            dimL = line.split(" ")
+            n = int(dimL[0])
+            m = int(dimL[1])
+            self.Dungeon = Dungeon(n, m)
+            self.X = self.Dungeon.size_x
+            self.Y = self.Dungeon.size_y
+            self.start_position = self.Dungeon.start_position
+            for i in range(n):
+                line = file.readline()
+                ElemL = line.split(" ")
+                for j in range(m):
+                    elmnt = ElemL[j][:1]
+                    self.add_element(elmnt, i, j)
+
+        self.Adventurer = Adventurer(self)
+
+    def get_state(self):
+        return (self.Adventurer.position, self.Adventurer.has_sword, self.Adventurer.has_key, self.Adventurer.has_treasure)
+
+
+    state = property(fget=get_state)
 
     def get_adventurer_position(self):
         return self.Adventurer.position

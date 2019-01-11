@@ -34,7 +34,7 @@ class MDP_Solver():
                             self.StatesDict[state][action] = set()
                         self.StatesDict[state][action].add((etat_destination, proba))
 
-        # print(self)
+        print("end mdp solver")
 
     def list_of_dest_position_proba_and_rewards(self, from_x, from_y, has_sword, has_key, has_treasure):
         case_element = self.config.Dungeon.grid[from_x][from_y]
@@ -116,62 +116,6 @@ class MDP_Solver():
             s += str(associated_set)
             s += "\n"
         return s
-
-    def print_policy(self,policy):
-        xS = [ [ None for j in range(self.config.Y)] for i in range(self.config.X) ]
-        xK = [ [ None for j in range(self.config.Y)] for i in range(self.config.X) ]
-        xSK = [ [ None for j in range(self.config.Y)] for i in range(self.config.X) ]
-        xKT = [ [ None for j in range(self.config.Y)] for i in range(self.config.X) ]
-        xSKT = [ [ None for j in range(self.config.Y)] for i in range(self.config.X) ]
-        xNone = [ [ None for j in range(self.config.Y)] for i in range(self.config.X) ]
-
-        for state,action in policy.items():
-            (i,j),S,K,T = state
-            if S :
-                if not K:
-                    xS[i][j] = action
-                elif K :
-                    if not T :
-                      xSK[i][j] = action
-                    else :
-                        xSKT[i][j] = action
-            elif K :
-                if not T:
-                    xK[i][j] = action
-                else :
-                    xKT[i][j] = action
-            else :
-                xNone[i][j] = action
-
-        def printing(x):
-            line = ""
-            s = ""
-            for i in range(len(x)) :
-                s += "\n | "
-                for j in range(len(x[i])) :
-                    if x[i][j] == Action.RIGHT :
-                        s += ">"
-                    elif x[i][j] == Action.LEFT :
-                        s += "<"
-                    elif x[i][j] == Action.UP :
-                        s += "^"
-                    else :
-                        s += "v"
-                    s += " | "
-            print(s)
-
-        print(" \n ********* Policy when nothing : *********")
-        printing(xNone)
-        print(" \n ********* Policy when S : *********")
-        printing(xS)
-        print(" \n ********* Policy when K : *********")
-        printing(xK)
-        print(" \n ********* Policy when SK : *********")
-        printing(xSK)
-        print(" \n ********* Policy when KT : *********")
-        printing(xKT)
-        print(" \n ********* Policy when SKT : *********")
-        printing(xSKT)
 
     def run_value_iteration(self, epsilon):
         max_dif_i = 100 # never choose epsilo > 100
