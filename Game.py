@@ -108,8 +108,8 @@ class Game:
         return Game(".game")
 
 if __name__ == '__main__':
-    # G = Game.random_generation(10, 10, "EASY")
-    G = Game(".game")#example_grid")       #toujours un espace avant retour a la ligne
+    G = Game.random_generation(10, 10, "EASY")
+    # G = Game(".game")#example_grid")
     # policy = G.mdp.run_linear_programming_resolution()
     if G.is_winnable():
     #     print(" WINNABLE ")

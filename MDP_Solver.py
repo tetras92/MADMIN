@@ -38,73 +38,74 @@ class MDP_Solver():
 
     def list_of_dest_position_proba_and_rewards(self, from_x, from_y, has_sword, has_key, has_treasure):
         case_element = self.config.Dungeon.grid[from_x][from_y]
+        return case_element.get_list_dest_and_rewards(from_x, from_y, has_treasure, has_sword, has_key)
 
-        if isinstance(case_element, W):
-            if has_treasure :
-                reward = 10
-            else:
-                reward = -5#-1
-            return [((self.config.start_position, has_sword, has_key, has_treasure), 1.)], reward
-        elif isinstance(case_element, E):
-            if not has_sword:
-                reward = 2#-1
-                return  [((self.config.start_position, has_sword, has_key, has_treasure), 0.3),
-                         (((from_x, from_y), has_sword, has_key, has_treasure), 0.7)], reward
-            else:
-                reward = 3
-                return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
-        elif isinstance(case_element, C):
-            reward = -5
-            return [((self.config.start_position, has_sword, has_key, has_treasure), 1.)], reward
-        elif isinstance(case_element, P):
-            reward = 2#0
-            list_of_non_wall_cells = self.config.Dungeon.list_of_non_wall_cells()
-            return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_non_wall_cells)) for dest_pos in list_of_non_wall_cells], reward
-        elif isinstance(case_element, MP):
-            reward = 3#1
-            list_of_neighbouring_cells = self.config.Dungeon.list_of_neighbouring_cells((from_x, from_y))
-            return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_neighbouring_cells)) for dest_pos in list_of_neighbouring_cells], reward
-        elif isinstance(case_element, R):
-            if has_treasure:
-                reward = 3
-            else:
-                reward = 3#0
-            return  [((self.config.start_position, has_sword, has_key, has_treasure), 0.4),
-                     (((from_x, from_y), has_sword, has_key, has_treasure), 0.6)], reward
-        elif isinstance(case_element, T):
-            if has_treasure:
-                reward = 0
-                return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
-            elif has_key:
-                reward = 10
-                return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
-            else:
-                reward = -5#0
-                return [(((from_x, from_y), has_sword, has_key,  has_treasure), 1.)], reward
-        elif isinstance(case_element, S):
-            if has_sword:
-                reward = 5#3
-            else:
-                reward = 5
-            return [(((from_x, from_y), True, has_key, has_treasure), 1.)], reward
-        elif isinstance(case_element, K):
-            if has_key:
-                reward = 3
-            else:
-                reward = 10
-            return [(((from_x, from_y), has_sword, True, has_treasure), 1.)], reward
-        elif isinstance(case_element, B):
-            if has_treasure:
-                if (from_x, from_y) == self.config.start_position:
-                    reward = 10
-                else:
-                    reward = 2
-            else:
-                reward = 3
-            return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
-        else:
-            print("Error")
-            exit(1001)
+        # if isinstance(case_element, W):
+        #     if has_treasure :
+        #         reward = 10
+        #     else:
+        #         reward = -5#-1
+        #     return [((self.config.start_position, has_sword, has_key, has_treasure), 1.)], reward
+        # elif isinstance(case_element, E):
+        #     if not has_sword:
+        #         reward = 2#-1
+        #         return  [((self.config.start_position, has_sword, has_key, has_treasure), 0.3),
+        #                  (((from_x, from_y), has_sword, has_key, has_treasure), 0.7)], reward
+        #     else:
+        #         reward = 3
+        #         return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
+        # elif isinstance(case_element, C):
+        #     reward = -5
+        #     return [((self.config.start_position, has_sword, has_key, has_treasure), 1.)], reward
+        # elif isinstance(case_element, P):
+        #     reward = 2#0
+        #     list_of_non_wall_cells = self.config.Dungeon.list_of_non_wall_cells()
+        #     return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_non_wall_cells)) for dest_pos in list_of_non_wall_cells], reward
+        # elif isinstance(case_element, MP):
+        #     reward = 3#1
+        #     list_of_neighbouring_cells = self.config.Dungeon.list_of_neighbouring_cells((from_x, from_y))
+        #     return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_neighbouring_cells)) for dest_pos in list_of_neighbouring_cells], reward
+        # elif isinstance(case_element, R):
+        #     if has_treasure:
+        #         reward = 3
+        #     else:
+        #         reward = 3#0
+        #     return  [((self.config.start_position, has_sword, has_key, has_treasure), 0.4),
+        #              (((from_x, from_y), has_sword, has_key, has_treasure), 0.6)], reward
+        # elif isinstance(case_element, T):
+        #     if has_treasure:
+        #         reward = 0
+        #         return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
+        #     elif has_key:
+        #         reward = 10
+        #         return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
+        #     else:
+        #         reward = -5#0
+        #         return [(((from_x, from_y), has_sword, has_key,  has_treasure), 1.)], reward
+        # elif isinstance(case_element, S):
+        #     if has_sword:
+        #         reward = 5#3
+        #     else:
+        #         reward = 5
+        #     return [(((from_x, from_y), True, has_key, has_treasure), 1.)], reward
+        # elif isinstance(case_element, K):
+        #     if has_key:
+        #         reward = 3
+        #     else:
+        #         reward = 10
+        #     return [(((from_x, from_y), has_sword, True, has_treasure), 1.)], reward
+        # elif isinstance(case_element, B):
+        #     if has_treasure:
+        #         if (from_x, from_y) == self.config.start_position:
+        #             reward = 10
+        #         else:
+        #             reward = 2
+        #     else:
+        #         reward = 3
+        #     return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
+        # else:
+        #     print("Error")
+        #     exit(1001)
 
 
     def __str__(self):

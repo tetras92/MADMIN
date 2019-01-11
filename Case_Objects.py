@@ -17,6 +17,10 @@ class Element():
         print("What i do is ...")
 
 
+    def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
+        pass
+
+
 class B(Element):
 
     def __init__(self, configuration):
@@ -33,6 +37,23 @@ class B(Element):
 
     def show_event(self):
         print("Blank cell")
+
+    def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
+        if has_treasure:
+            if (from_x, from_y) == self.configuration.start_position:
+                reward = 10
+            else:
+                reward = 2
+        # else :
+            # reward = 3
+        else :
+            if (from_x, from_y) == self.configuration.start_position :
+                reward = -10
+            else :
+                reward = 3
+
+        return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
+
 
 class C(Element):
 
@@ -52,6 +73,10 @@ class C(Element):
 
     def show_event(self):
         print("immediate death")
+
+    def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
+        reward = -5
+        return [((self.configuration.start_position, has_sword, has_key, has_treasure), 1.)], reward
 
 class E(Element):
 
@@ -77,6 +102,15 @@ class E(Element):
     def show_event(self):
         print("a malicious foe is attacking the adventurer (the adventurer is victorious with p_enemy probability, fixed to 0.7, otherwise the adventurer is dead")
 
+    def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
+        if not has_sword:
+            reward = 2#-1
+            return  [((self.configuration.start_position, has_sword, has_key, has_treasure), 0.3),
+                     (((from_x, from_y), has_sword, has_key, has_treasure), 0.7)], reward
+        else:
+            reward = 3
+            return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
+
 class K(Element):
 
     def __init__(self, configuration):
@@ -97,6 +131,13 @@ class K(Element):
 
     def show_event(self):
         print("necessary to open the treasure's room")
+
+    def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
+        if has_key:
+            reward = 3
+        else:
+            reward = 10
+        return [(((from_x, from_y), has_sword, True, has_treasure), 1.)], reward
 
 class P(Element):
 
@@ -119,6 +160,11 @@ class P(Element):
     def show_event(self):
         print("a magic portal teleports the agent to a random (non-wall) cell of the dungeon")
 
+    def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
+        reward = 2#0
+        list_of_non_wall_cells = self.configuration.Dungeon.list_of_non_wall_cells()
+        return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_non_wall_cells)) for dest_pos in list_of_non_wall_cells], reward
+
 class MP(Element):
 
     def __init__(self, configuration):
@@ -140,6 +186,11 @@ class MP(Element):
     def show_event(self):
         print("the pavement is moving! the adventurer is forced to take refuge in one of the neighbouring cells (at random)")
 
+    def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
+        reward = 3#1
+        list_of_neighbouring_cells = self.configuration.Dungeon.list_of_neighbouring_cells((from_x, from_y))
+        return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_neighbouring_cells)) for dest_pos in list_of_neighbouring_cells], reward
+
 class S(Element):
 
     def __init__(self, configuration):
@@ -160,6 +211,13 @@ class S(Element):
 
     def show_event(self):
         print("To open the door of the treasure's room it is necesary to have the golden key")
+
+    def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
+        if has_sword:
+            reward = 5#3
+        else:
+            reward = 5
+        return [(((from_x, from_y), True, has_key, has_treasure), 1.)], reward
 
 class R(Element):
 
@@ -190,6 +248,15 @@ class R(Element):
               "the adventure to the starting cell through an underground tunnel (probability 0.3)"
               "or nothin happen (probability 0.6)")
 
+    def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
+        if has_treasure:
+            reward = 3
+        else:
+            reward = 3#0
+        return  [((self.configuration.start_position, has_sword, has_key, has_treasure), 0.4),
+                 (((from_x, from_y), has_sword, has_key, has_treasure), 0.6)], reward
+
+
 class T(Element):
 
     def __init__(self, configuration):
@@ -213,6 +280,17 @@ class T(Element):
     def show_event(self):
         print("To open the door of the treasure's room it is necesary to have the golden key")
 
+    def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
+        if has_treasure:
+            reward = 0
+            return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
+        elif has_key:
+            reward = 10
+            return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
+        else:
+            reward = -5#0
+            return [(((from_x, from_y), has_sword, has_key,  has_treasure), 1.)], reward
+
 class W(Element):
 
     def __init__(self, configuration):
@@ -232,4 +310,10 @@ class W(Element):
     def show_event(self):
         print("a attempt to moving to a wall will bounce to the starting position")
 
+    def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
+        if has_treasure :
+            reward = 10
+        else:
+            reward = -5#-1
+        return [((self.configuration.start_position, has_sword, has_key, has_treasure), 1.)], reward
 
