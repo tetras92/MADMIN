@@ -30,7 +30,7 @@ class Game:
                 self.config.Adventurer.move(Action.RIGHT)
             else:
                 print("Error")
-            time.sleep(3)
+            time.sleep(2)
 
             G.show()
 
@@ -41,7 +41,7 @@ class Game:
             action = policy_dict[state]
             # print (action)
             self.config.Adventurer.move(action)
-            time.sleep(3)
+            time.sleep(1)
 
     def is_winnable(self):
         DD_tab = [[0 for j in range(self.config.Y)] for i in range(self.config.X)]
@@ -107,11 +107,12 @@ class Game:
 
 if __name__ == '__main__':
     # G = Game.random_generation(10, 10, "EASY")
-    G = Game("example_grid")       #toujours un espace avant retour a la ligne
+    G = Game("bridge_to_victory")       #toujours un espace avant retour a la ligne
+    # G = Game("AK_game")       #toujours un espace avant retour a la ligne
 
     policy = G.mdp.run_value_iteration(0.01)
     # policy = G.mdp.run_linear_programming_resolution()
     print_policy(policy, G.config.X, G.config.Y)
 
-    # if G.is_winnable():
-    #     G.play_with_policy(policy)
+    if G.is_winnable():
+        G.play_with_policy(policy)

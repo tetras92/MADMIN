@@ -104,7 +104,7 @@ class QLearning():
     def best_action_from_state(self, state):
         best_action = None
         expected_reward_associated = 0
-        if random.random() < 0.5:
+        if random.random() < 0.3:
             L = list(self.Q_table[state].keys())
             return L[random.randint(0, len(L)-1)]
 
@@ -125,7 +125,7 @@ class QLearning():
                 expected_reward_associated =  self.Q_table[state][possible_action]
         return best_action
 
-    def run_Q_learning(self, max_episodes=10000):
+    def run_Q_learning(self, max_episodes=1000000):
         episode = 0
 
         while episode < max_episodes:
@@ -150,8 +150,8 @@ class QLearning():
 
 
 if __name__ == '__main__':
-    QL = QLearning("AK_game")
+    QL = QLearning("example_grid")
     policy = QL.run_Q_learning()
     print_policy(policy, QL.config.X, QL.config.Y)
-    G = Game("AK_game")
+    G = Game("example_grid")
     G.play_with_policy(policy)

@@ -41,16 +41,16 @@ class B(Element):
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
         if has_treasure:
             if (from_x, from_y) == self.configuration.start_position:
-                reward = 10
+                reward = 100
             else:
-                reward = 2
+                reward = -1
         # else :
             # reward = 3
         else :
             if (from_x, from_y) == self.configuration.start_position :
-                reward = -10
+                reward = -1
             else :
-                reward = 3
+                reward = -1
 
         return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
 
@@ -75,7 +75,10 @@ class C(Element):
         print("immediate death")
 
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
-        reward = -5
+        if has_treasure:
+            reward = 100
+        else :
+            reward = -200
         return [((self.configuration.start_position, has_sword, has_key, has_treasure), 1.)], reward
 
 class E(Element):
@@ -104,11 +107,11 @@ class E(Element):
 
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
         if not has_sword:
-            reward = 2#-1
+            reward = -1
             return  [((self.configuration.start_position, has_sword, has_key, has_treasure), 0.3),
                      (((from_x, from_y), has_sword, has_key, has_treasure), 0.7)], reward
         else:
-            reward = 3
+            reward = -1
             return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
 
 class K(Element):
@@ -134,9 +137,9 @@ class K(Element):
 
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
         if has_key:
-            reward = 3
+            reward = -1
         else:
-            reward = 10
+            reward = 100
         return [(((from_x, from_y), has_sword, True, has_treasure), 1.)], reward
 
 class P(Element):
@@ -161,7 +164,7 @@ class P(Element):
         print("a magic portal teleports the agent to a random (non-wall) cell of the dungeon")
 
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
-        reward = 2#0
+        reward = -1
         list_of_non_wall_cells = self.configuration.Dungeon.list_of_non_wall_cells()
         return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_non_wall_cells)) for dest_pos in list_of_non_wall_cells], reward
 
@@ -187,7 +190,7 @@ class MP(Element):
         print("the pavement is moving! the adventurer is forced to take refuge in one of the neighbouring cells (at random)")
 
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
-        reward = 3#1
+        reward = -1
         list_of_neighbouring_cells = self.configuration.Dungeon.list_of_neighbouring_cells((from_x, from_y))
         return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_neighbouring_cells)) for dest_pos in list_of_neighbouring_cells], reward
 
@@ -214,10 +217,15 @@ class S(Element):
 
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
         if has_sword:
-            reward = 5#3
+            reward = -1
         else:
-            reward = 5
+            reward = 10
+
+        if has_key and has_treasure :
+            reward = -1
+
         return [(((from_x, from_y), True, has_key, has_treasure), 1.)], reward
+
 
 class R(Element):
 
@@ -250,9 +258,9 @@ class R(Element):
 
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
         if has_treasure:
-            reward = 3
+            reward = 40
         else:
-            reward = 3#0
+            reward = -1
         return  [((self.configuration.start_position, has_sword, has_key, has_treasure), 0.4),
                  (((from_x, from_y), has_sword, has_key, has_treasure), 0.6)], reward
 
@@ -282,13 +290,13 @@ class T(Element):
 
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
         if has_treasure:
-            reward = 0
+            reward = -1
             return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
         elif has_key:
-            reward = 10
+            reward = 100
             return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
         else:
-            reward = -5#0
+            reward = -1#0
             return [(((from_x, from_y), has_sword, has_key,  has_treasure), 1.)], reward
 
 class W(Element):
@@ -312,8 +320,8 @@ class W(Element):
 
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
         if has_treasure :
-            reward = 10
+            reward = 100
         else:
-            reward = -5#-1
+            reward = -1
         return [((self.configuration.start_position, has_sword, has_key, has_treasure), 1.)], reward
 
