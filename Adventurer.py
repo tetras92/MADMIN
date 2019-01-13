@@ -1,4 +1,3 @@
-from Action import Action
 class Adventurer:
 
     def __init__(self, configuration=None):

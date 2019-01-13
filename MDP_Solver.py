@@ -1,6 +1,7 @@
 from Action import *
-from Case_Objects import *
 from gurobipy import *
+from Game import Game
+from Useful_methods import *
 
 
 class MDP_Solver():
@@ -34,78 +35,11 @@ class MDP_Solver():
                             self.StatesDict[state][action] = set()
                         self.StatesDict[state][action].add((etat_destination, proba))
 
-        print("end mdp solver")
+        # print("end mdp solver")
 
     def list_of_dest_position_proba_and_rewards(self, from_x, from_y, has_sword, has_key, has_treasure):
         case_element = self.config.Dungeon.grid[from_x][from_y]
-
-        if isinstance(case_element, W):
-            if has_treasure :
-                reward = 10
-            else:
-                reward = -1
-            return [((self.config.start_position, has_sword, has_key, has_treasure), 1.)], reward
-        elif isinstance(case_element, E):
-            if not has_sword:
-                reward = -1
-                return  [((self.config.start_position, has_sword, has_key, has_treasure), 0.3),
-                         (((from_x, from_y), has_sword, has_key, has_treasure), 0.7)], reward
-            else:
-                reward = 3
-                return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
-        elif isinstance(case_element, C):
-            reward = -5
-            return [((self.config.start_position, has_sword, has_key, has_treasure), 1.)], reward
-        elif isinstance(case_element, P):
-            reward = 0
-            list_of_non_wall_cells = self.config.Dungeon.list_of_non_wall_cells()
-            return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_non_wall_cells)) for dest_pos in list_of_non_wall_cells], reward
-        elif isinstance(case_element, MP):
-            reward = 1
-            list_of_neighbouring_cells = self.config.Dungeon.list_of_neighbouring_cells((from_x, from_y))
-            return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_neighbouring_cells)) for dest_pos in list_of_neighbouring_cells], reward
-        elif isinstance(case_element, R):
-            if has_treasure:
-                reward = 3
-            else:
-                reward = 0
-            return  [((self.config.start_position, has_sword, has_key, has_treasure), 0.4),
-                     (((from_x, from_y), has_sword, has_key, has_treasure), 0.6)], reward
-        elif isinstance(case_element, T):
-            if has_treasure:
-                reward = 0
-                return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
-            elif has_key:
-                reward = 100
-                return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
-            else:
-                reward = 0
-                return [(((from_x, from_y), has_sword, has_key,  has_treasure), 1.)], reward
-        elif isinstance(case_element, S):
-            if has_sword:
-                reward = 3
-            else:
-                reward = 5
-            return [(((from_x, from_y), True, has_key, has_treasure), 1.)], reward
-        elif isinstance(case_element, K):
-            if has_key:
-                reward = 3
-            else:
-                reward = 10
-            return [(((from_x, from_y), has_sword, True, has_treasure), 1.)], reward
-        elif isinstance(case_element, B):
-            if has_treasure:
-                if (from_x, from_y) == self.config.start_position:
-                    reward = 10
-                else:
-                    reward = 2
-            else:
-                reward = 3
-            return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
-        else:
-            print("Error")
-            exit(1001)
-
+        return case_element.get_list_dest_and_rewards(from_x, from_y, has_treasure, has_sword, has_key)
 
     def __str__(self):
         s = ""
@@ -142,11 +76,7 @@ class MDP_Solver():
                 States_best_actions_Table[state] = best_action #.append(best_action)
             i += 1
         #calcul of optimal policy
-        # print (States_best_actions_Table)
         return States_best_actions_Table
-        # for state, action in States_best_actions_Table.items():
-        #     x, y = action
-        #     print (state, (x, y))
 
 
     def run_linear_programming_resolution(self):
@@ -183,7 +113,7 @@ class MDP_Solver():
             obj += x[i]
         m.setObjective(obj, GRB.MINIMIZE)
         m.update()
-        print(obj)
+        # print(obj)
         m.optimize()
 
         # Politique
@@ -199,7 +129,19 @@ class MDP_Solver():
                     best_action = action
                     best_value = state_action_value
             States_best_actions_Table[state] = best_action
-        print(States_best_actions_Table)
+        # print(States_best_actions_Table)
         return States_best_actions_Table
 
 
+
+if __name__ == '__main__':
+    # G = Game.random_generation(10, 10, "EASY")
+    G = Game("Instances/bridge_to_victory")
+    mdp_solver = MDP_Solver(G.config)
+    policy = mdp_solver.run_value_iteration(0.01)                      # ITERATION VALUE
+
+    # policy = mdp_solver.run_linear_programming_resolution()               # LINEAR PROGRAMING
+    print_policy(policy, G.config.X, G.config.Y)
+
+    if G.is_winnable():
+        G.play_with_policy(policy)

@@ -1,21 +1,20 @@
 from Configuration import Configuration
-from Action import Action
 from Case_Objects import *
-from MDP_Solver import MDP_Solver
 from Useful_methods import *
 import os
-#from getch import getch
 import time
+
 
 class Game:
     
     def __init__(self, filename):
         self.config = self.load_game(filename)
-        self.mdp = MDP_Solver(self.config)
+        self.mdp = None
+        self.qlearning = None
 
     def play(self):
         while not self.has_won():
-            G.show()
+            self.show()
             print("Press z (up), q(right), s(down) or d(left)\n")
             #print(">>> ")
             #car = getch()
@@ -32,17 +31,16 @@ class Game:
                 print("Error")
             time.sleep(2)
 
-            G.show()
+            self.show()
 
     def play_with_policy(self, policy_dict):
         while not self.has_won():
             self.show()
-            state = self.config.get_mdp_state()
+            state = self.config.get_state()
             action = policy_dict[state]
             # print (action)
             self.config.Adventurer.move(action)
-            time.sleep(2)
-
+            time.sleep(1)
 
     def is_winnable(self):
         DD_tab = [[0 for j in range(self.config.Y)] for i in range(self.config.X)]
@@ -79,15 +77,11 @@ class Game:
 
         return key_reachable and DD_tab[t_x][t_y] != 0
 
-
     def load_game(self,filename):
         return Configuration(filename)
-        
+
     def has_won(self):
         return self.config.Adventurer.has_treasure and self.config.Adventurer.position == self.config.start_position
-
-    def update(self):
-        return 0
 
     def show(self):
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -104,21 +98,5 @@ class Game:
                 nb = int(prop * n * m)
                 D[case_type] = nb
         generate_file_game(generate_position_cells_t(n, m, D))
-        print("end .game")
         return Game(".game")
 
-if __name__ == '__main__':
-    G = Game.random_generation(10, 10, "EASY")
-    # G = Game("example_grid")       #toujours un espace avant retour a la ligne
-    policy = G.mdp.run_value_iteration(0.01)
-    # policy = G.mdp.run_linear_programming_resolution()
-
-
-    if G.is_winnable():
-    #     print(" WINNABLE ")
-    #
-        G.play_with_policy(policy)
-    # if G.is_winnable():
-    #     print(" WINNABLE ")
-    # else:
-    #     print(" NO SOLUTION")

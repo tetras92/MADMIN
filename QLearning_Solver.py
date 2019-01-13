@@ -1,9 +1,10 @@
 from Action import *
 from Case_Objects import *
 from Game import Game
-import time
 from Useful_methods import print_policy
-class QLearning():
+
+
+class QLearning_Solver():
 
     def __init__(self, filename):
         self.QGame = Game(filename)
@@ -16,7 +17,6 @@ class QLearning():
                            for has_sword in [True, False] if (not has_treasure) or has_key}
         self.Reward_tab = dict()
         self.Q_table = dict()
-        self.current_policy = dict()
         self.config = configuration
         for state in self.StatesDict:
             position, has_sword, has_key, has_treasure = state
@@ -33,78 +33,14 @@ class QLearning():
                     self.Q_table[state][action] = 0                                                 #initialization of Q_Table
 
 
-
     def associated_reward(self, from_x, from_y, has_sword, has_key, has_treasure):
         case_element = self.config.Dungeon.grid[from_x][from_y]
-
-        if isinstance(case_element, W):
-            if has_treasure :
-                reward = 100
-            else:
-                reward = -1
-            return reward
-        elif isinstance(case_element, E):
-            if not has_sword:
-                reward = -1
-                return  reward
-            else:
-                reward = 3
-                return reward
-        elif isinstance(case_element, C):
-            reward = -5
-            return reward
-        elif isinstance(case_element, P):
-            reward = 0
-            return  reward
-        elif isinstance(case_element, MP):
-            reward = 1
-            return  reward
-        elif isinstance(case_element, R):
-            if has_treasure:
-                reward = 3
-            else:
-                reward = 0
-            return reward
-        elif isinstance(case_element, T):
-            if has_treasure:
-                reward = 0
-                return reward
-            elif has_key:
-                reward = 100
-                return reward
-            else:
-                reward = 0
-                return reward
-        elif isinstance(case_element, S):
-            if has_sword:
-                reward = 3
-            else:
-                reward = 5
-            return reward
-        elif isinstance(case_element, K):
-            if has_key:
-                reward = 3
-            else:
-                reward = 10
-            return reward
-        elif isinstance(case_element, B):
-            if has_treasure:
-                if (from_x, from_y) == self.config.start_position:
-                    reward = 10
-                else:
-                    reward = 2
-            else:
-                reward = 3
-            return reward
-        else:
-            print("Error")
-            exit(1001)
-
+        return case_element.get_list_dest_and_rewards(from_x, from_y, has_treasure, has_sword, has_key)[1]
 
     def best_action_from_state(self, state):
         best_action = None
         expected_reward_associated = 0
-        if random.random() < 0.5:
+        if random.random() < 0.3:
             L = list(self.Q_table[state].keys())
             return L[random.randint(0, len(L)-1)]
 
@@ -113,7 +49,7 @@ class QLearning():
                 # if self.Q_table[state][possible_action] > expected_reward_associated:
                 #     print("ame")
                 best_action = possible_action
-                expected_reward_associated =  self.Q_table[state][possible_action]
+                expected_reward_associated = self.Q_table[state][possible_action]
         return best_action
 
     def best_action_from_state_policy(self, state):
@@ -125,7 +61,7 @@ class QLearning():
                 expected_reward_associated =  self.Q_table[state][possible_action]
         return best_action
 
-    def run_Q_learning(self, max_episodes=10000):
+    def run_Q_learning(self, max_episodes=100000):
         episode = 0
 
         while episode < max_episodes:
@@ -144,15 +80,15 @@ class QLearning():
             # self.QGame.show()
 
         policy = {state : self.best_action_from_state_policy(state) for state in self.Q_table}
-        print(episode)
+        # print(episode)
         return policy
 
 
 
-
 if __name__ == '__main__':
-    QL = QLearning("AK_game")
+    filename = "Instances/example_grid"
+    QL = QLearning_Solver(filename)
     policy = QL.run_Q_learning()
     print_policy(policy, QL.config.X, QL.config.Y)
-    G = Game("AK_game")
+    G = Game(filename)
     G.play_with_policy(policy)

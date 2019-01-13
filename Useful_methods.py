@@ -1,12 +1,5 @@
 import random
 from Action import Action
-#
-# def read_nb_cells_type(filename):
-#     prop = dict()
-#     f = open(filename,"r")
-#     for line in f:
-#         prop[str(line[0])] = int(line[2])
-#     return prop
 
 
 

@@ -24,10 +24,7 @@ class Configuration:
 
         self.Adventurer = Adventurer(self)
 
-        print("end config")
-
     def reset(self):
-        self.Adventurer.position = self.start_position
         with open(self.filename) as file:
             line = file.readline()
             dimL = line.split(" ")
@@ -95,8 +92,6 @@ class Configuration:
         else:
             exit(1000)
 
-    def get_mdp_state(self):
-        return (self.Adventurer.position, self.Adventurer.has_sword, self.Adventurer.has_key, self.Adventurer.has_treasure)
 
     def __str__(self):
         s = ""
