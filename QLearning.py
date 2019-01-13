@@ -37,69 +37,6 @@ class QLearning():
         case_element = self.config.Dungeon.grid[from_x][from_y]
         return case_element.get_list_dest_and_rewards(from_x, from_y, has_treasure, has_sword, has_key)[1]
 
-        # if isinstance(case_element, W):
-        #     if has_treasure :
-        #         reward = 100
-        #     else:
-        #         reward = -1
-        #     return reward
-        # elif isinstance(case_element, E):
-        #     if not has_sword:
-        #         reward = -1
-        #         return  reward
-        #     else:
-        #         reward = 3
-        #         return reward
-        # elif isinstance(case_element, C):
-        #     reward = -5
-        #     return reward
-        # elif isinstance(case_element, P):
-        #     reward = 0
-        #     return  reward
-        # elif isinstance(case_element, MP):
-        #     reward = 1
-        #     return  reward
-        # elif isinstance(case_element, R):
-        #     if has_treasure:
-        #         reward = 3
-        #     else:
-        #         reward = 0
-        #     return reward
-        # elif isinstance(case_element, T):
-        #     if has_treasure:
-        #         reward = 0
-        #         return reward
-        #     elif has_key:
-        #         reward = 100
-        #         return reward
-        #     else:
-        #         reward = 0
-        #         return reward
-        # elif isinstance(case_element, S):
-        #     if has_sword:
-        #         reward = 3
-        #     else:
-        #         reward = 5
-        #     return reward
-        # elif isinstance(case_element, K):
-        #     if has_key:
-        #         reward = 3
-        #     else:
-        #         reward = 10
-        #     return reward
-        # elif isinstance(case_element, B):
-        #     if has_treasure:
-        #         if (from_x, from_y) == self.config.start_position:
-        #             reward = 10
-        #         else:
-        #             reward = 2
-        #     else:
-        #         reward = 3
-        #     return reward
-        # else:
-        #     print("Error")
-        #     exit(1001)
-
 
     def best_action_from_state(self, state):
         best_action = None

@@ -1,20 +1,25 @@
 from Action import *
 from Case_Objects import *
+from Configuration import Configuration
+from Useful_methods import *
+import os
+import time
+#from getch import getch
 # from gurobipy import *
 
 
 class MDP_Solver():
 
-    def __init__(self, configuration):
+    def __init__(self,filename):
+        self.config = self.load_game(filename)
         self.StatesDict = {((i,j), has_sword, has_key, has_treasure) : dict()
-                           for i in range(configuration.X)
-                           for j in range(configuration.Y)
+                           for i in range(self.config.X)
+                           for j in range(self.config.Y)
                            for has_key in [True, False]
                            for has_treasure in [True, False]
                            for has_sword in [True, False] if (not has_treasure) or has_key}
         self.Reward_tab = dict()
         nb = 0
-        self.config = configuration
         for state in self.StatesDict:
             position, has_sword, has_key, has_treasure = state
             self.Reward_tab[state] = dict()
@@ -24,7 +29,7 @@ class MDP_Solver():
                 x, y = position
                 new_x = x+dx
                 new_y = y+dy
-                if configuration.Dungeon.is_valid_position(new_x, new_y):
+                if self.config.Dungeon.is_valid_position(new_x, new_y):
                     #L : list of new positions and proba
                     L, reward = self.list_of_dest_position_proba_and_rewards(new_x, new_y, has_sword, has_key, has_treasure)
                     self.Reward_tab[state][action] = reward
@@ -40,72 +45,6 @@ class MDP_Solver():
         case_element = self.config.Dungeon.grid[from_x][from_y]
         return case_element.get_list_dest_and_rewards(from_x, from_y, has_treasure, has_sword, has_key)
 
-        # if isinstance(case_element, W):
-        #     if has_treasure :
-        #         reward = 10
-        #     else:
-        #         reward = -5#-1
-        #     return [((self.config.start_position, has_sword, has_key, has_treasure), 1.)], reward
-        # elif isinstance(case_element, E):
-        #     if not has_sword:
-        #         reward = 2#-1
-        #         return  [((self.config.start_position, has_sword, has_key, has_treasure), 0.3),
-        #                  (((from_x, from_y), has_sword, has_key, has_treasure), 0.7)], reward
-        #     else:
-        #         reward = 3
-        #         return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
-        # elif isinstance(case_element, C):
-        #     reward = -5
-        #     return [((self.config.start_position, has_sword, has_key, has_treasure), 1.)], reward
-        # elif isinstance(case_element, P):
-        #     reward = 2#0
-        #     list_of_non_wall_cells = self.config.Dungeon.list_of_non_wall_cells()
-        #     return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_non_wall_cells)) for dest_pos in list_of_non_wall_cells], reward
-        # elif isinstance(case_element, MP):
-        #     reward = 3#1
-        #     list_of_neighbouring_cells = self.config.Dungeon.list_of_neighbouring_cells((from_x, from_y))
-        #     return  [((dest_pos, has_sword, has_key, has_treasure), 1./len(list_of_neighbouring_cells)) for dest_pos in list_of_neighbouring_cells], reward
-        # elif isinstance(case_element, R):
-        #     if has_treasure:
-        #         reward = 3
-        #     else:
-        #         reward = 3#0
-        #     return  [((self.config.start_position, has_sword, has_key, has_treasure), 0.4),
-        #              (((from_x, from_y), has_sword, has_key, has_treasure), 0.6)], reward
-        # elif isinstance(case_element, T):
-        #     if has_treasure:
-        #         reward = 0
-        #         return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
-        #     elif has_key:
-        #         reward = 10
-        #         return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
-        #     else:
-        #         reward = -5#0
-        #         return [(((from_x, from_y), has_sword, has_key,  has_treasure), 1.)], reward
-        # elif isinstance(case_element, S):
-        #     if has_sword:
-        #         reward = 5#3
-        #     else:
-        #         reward = 5
-        #     return [(((from_x, from_y), True, has_key, has_treasure), 1.)], reward
-        # elif isinstance(case_element, K):
-        #     if has_key:
-        #         reward = 3
-        #     else:
-        #         reward = 10
-        #     return [(((from_x, from_y), has_sword, True, has_treasure), 1.)], reward
-        # elif isinstance(case_element, B):
-        #     if has_treasure:
-        #         if (from_x, from_y) == self.config.start_position:
-        #             reward = 10
-        #         else:
-        #             reward = 2
-        #     else:
-        #         reward = 3
-        #     return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
-        # else:
-        #     print("Error")
-        #     exit(1001)
 
     def __str__(self):
         s = ""
@@ -198,4 +137,109 @@ class MDP_Solver():
     #     # print(States_best_actions_Table)
     #     return States_best_actions_Table
 
+    def play(self):
+        while not self.has_won():
+            G.show()
+            print("Press z (up), q(right), s(down) or d(left)\n")
+            # print(">>> ")
+            # car = getch()
+            car = raw_input(">>> ")
+            if car == "z":
+                self.config.Adventurer.move(Action.UP)
+            elif car == "s":
+                self.config.Adventurer.move(Action.DOWN)
+            elif car == "q":
+                self.config.Adventurer.move(Action.LEFT)
+            elif car == "d":
+                self.config.Adventurer.move(Action.RIGHT)
+            else:
+                print("Error")
+            time.sleep(2)
 
+            G.show()
+
+    def play_with_policy(self, policy_dict):
+        while not self.has_won():
+            self.show()
+            state = self.config.get_mdp_state()
+            action = policy_dict[state]
+            # print (action)
+            self.config.Adventurer.move(action)
+            time.sleep(1)
+
+    def is_winnable(self):
+        DD_tab = [[0 for j in range(self.config.Y)] for i in range(self.config.X)]
+        x_A, y_A = self.config.Adventurer.position
+        DD_tab[x_A][y_A] = 1
+        E = set()
+        E.add(self.config.Adventurer.position)
+        while len(E) != 0:
+            current_pos = E.pop()
+            x_c, y_c = current_pos
+            Neigh_cells = self.config.Dungeon.list_of_neighbouring_cells(current_pos)
+            for x, y in Neigh_cells:
+                O = self.config.Dungeon.grid[x][y]
+                if not isinstance(O, W) and not isinstance(O, C):
+                    if DD_tab[x][y] == 0 or DD_tab[x][y] > DD_tab[x_c][y_c] + 1:
+                        DD_tab[x][y] = DD_tab[x_c][y_c] + 1
+                        E.add((x, y))
+
+        key_reachable = False
+        Keys_set = set(self.config.Dungeon.list_of_keys_cells())
+        print(Keys_set)
+        while not key_reachable and len(Keys_set) != 0:
+            k_x, k_y = Keys_set.pop()
+            if DD_tab[k_x][k_y] != 0:
+                key_reachable = True
+
+        t_x, t_y = self.config.Dungeon.treasure_position
+        s = ""
+        for i in range(self.config.X):
+            for j in range(self.config.Y):
+                s += str(DD_tab[i][j]) + " "
+            s += "\n"
+        print(s)
+
+        return key_reachable and DD_tab[t_x][t_y] != 0
+
+    def load_game(self, filename):
+        return Configuration(filename)
+
+    def has_won(self):
+        return self.config.Adventurer.has_treasure and self.config.Adventurer.position == self.config.start_position
+
+    def update(self):
+        return 0
+
+    def show(self):
+        os.system('cls' if os.name == 'nt' else 'clear')
+        self.config.show()
+
+    @staticmethod
+    def random_generation(n, m, level="HARD"):
+        D = dict()
+        with open(level, "r") as file:
+            for line in file:
+                L = line.split(" ")
+                case_type = L[0]
+                prop = float(L[1]) / 100
+                nb = int(prop * n * m)
+                D[case_type] = nb
+        generate_file_game(generate_position_cells_t(n, m, D))
+        # print("end .game")
+        return MDP_Solver(".game")
+
+
+
+
+if __name__ == '__main__':
+    # G = MDP_Solver.random_generation(10, 10, "EASY")
+    G = MDP_Solver("bridge_to_victory")       #toujours un espace avant retour a la ligne
+    # G = MDP_Solver("AK_game")       #toujours un espace avant retour a la ligne
+
+    policy = G.run_value_iteration(0.01)
+    # policy = G.run_linear_programming_resolution()
+    print_policy(policy, G.config.X, G.config.Y)
+
+    if G.is_winnable():
+        G.play_with_policy(policy)
