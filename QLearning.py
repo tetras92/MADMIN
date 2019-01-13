@@ -87,8 +87,15 @@ class QLearning():
 
 
 if __name__ == '__main__':
-    QL = QLearning("example_grid")
+
+    # QL = QLearning("bridge_to_victory")
+    QL = QLearning("example_grid") #bridge_to_victory
+
     policy = QL.run_Q_learning()
     print_policy(policy, QL.config.X, QL.config.Y)
+
+    # G = Game("bridge_to_victory")
     G = Game("example_grid")
-    G.play_with_policy(policy)
+
+    if G.is_winnable():
+        G.play_with_policy(policy)
