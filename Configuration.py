@@ -104,6 +104,12 @@ class Configuration:
                     s += "* "
             s += "\n"
         s += "="*(self.Y * 2)
+        if self.Adventurer.has_sword:
+            s += "S"
+        if self.Adventurer.has_key:
+            s += "K"
+        if self.Adventurer.has_treasure:
+            s += "T"
         s += "\n"
         return s
 

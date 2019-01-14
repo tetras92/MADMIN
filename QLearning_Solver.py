@@ -40,7 +40,7 @@ class QLearning_Solver():
     def best_action_from_state(self, state):
         best_action = None
         expected_reward_associated = 0
-        if random.random() < 0.3:
+        if random.random() < 0.1:
             L = list(self.Q_table[state].keys())
             return L[random.randint(0, len(L)-1)]
 
@@ -61,20 +61,20 @@ class QLearning_Solver():
                 expected_reward_associated =  self.Q_table[state][possible_action]
         return best_action
 
-    def run_Q_learning(self, max_episodes=100000):
+    def run_Q_learning(self, max_episodes=100):
         episode = 0
 
         while episode < max_episodes:
-            # self.QGame.show()
-            episode += 1
+
             state = self.QGame.config.state
             action = self.best_action_from_state(state)
             self.QGame.config.Adventurer.move(action)
             reward = self.Reward_tab[state][action]
             state_after_move = self.QGame.config.state
             max_expected_reward_for_state_after_move = max(self.Q_table[state_after_move].values())
-            self.Q_table[state][action] += (0.8 * (reward + 0.9 * max_expected_reward_for_state_after_move - self.Q_table[state][action]))
+            self.Q_table[state][action] += (0.1 * (reward + 0.9 * max_expected_reward_for_state_after_move - self.Q_table[state][action]))
             if self.QGame.has_won():
+                episode += 1
                 self.QGame.config.reset()
             # time.sleep(1)
             # self.QGame.show()
@@ -90,5 +90,5 @@ if __name__ == '__main__':
     QL = QLearning_Solver(filename)
     policy = QL.run_Q_learning()
     print_policy(policy, QL.config.X, QL.config.Y)
-    G = Game(filename)
-    G.play_with_policy(policy)
+    # G = Game(filename)
+    # G.play_with_policy(policy)

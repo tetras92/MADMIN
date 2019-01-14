@@ -1,4 +1,3 @@
-from Action import *
 from gurobipy import *
 from Game import Game
 from Useful_methods import *
@@ -102,9 +101,8 @@ class MDP_Solver():
                 for dest_stat, proba in Set_of_couple_of_dest_stat_proba:
                     c -= 0.9*proba*x[State2varnumDict[dest_stat]]
                     # print(c)
-                cst = m.addConstr(c >= self.Reward_tab[state][action], "Cstr state {} action {}".format(state, action))
+                m.addConstr(c >= self.Reward_tab[state][action], "Cstr state {} action {}".format(state, action))
                 m.update()
-                # print(cst)
         m.update()
         #l'objectif
         obj = LinExpr()
@@ -115,7 +113,7 @@ class MDP_Solver():
         m.update()
         # print(obj)
         m.optimize()
-
+        print("=====> ", m.Runtime)
         # Politique
         States_best_actions_Table = {state : None for state in self.StatesDict}
         for state in self.StatesDict:
@@ -135,13 +133,14 @@ class MDP_Solver():
 
 
 if __name__ == '__main__':
-    # G = Game.random_generation(10, 10, "EASY")
-    G = Game("Instances/bridge_to_victory")
-    mdp_solver = MDP_Solver(G.config)
-    policy = mdp_solver.run_value_iteration(0.01)                      # ITERATION VALUE
 
-    # policy = mdp_solver.run_linear_programming_resolution()               # LINEAR PROGRAMING
+    filename = "HARD_10_10"
+    G = Game("Instances/"+filename)
+    mdp_solver = MDP_Solver(G.config)
+    # policy = mdp_solver.run_value_iteration(0.01)                           # ITERATION VALUE
+
+    policy = mdp_solver.run_linear_programming_resolution()               # LINEAR PROGRAMING
     print_policy(policy, G.config.X, G.config.Y)
 
-    if G.is_winnable():
-        G.play_with_policy(policy)
+    # if G.is_winnable():
+    #     G.play_with_policy(policy)
