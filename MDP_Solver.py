@@ -134,13 +134,26 @@ class MDP_Solver():
 
 if __name__ == '__main__':
 
-    filename = "HARD_10_10"
-    G = Game("Instances/"+filename)
-    mdp_solver = MDP_Solver(G.config)
-    # policy = mdp_solver.run_value_iteration(0.01)                           # ITERATION VALUE
 
-    policy = mdp_solver.run_linear_programming_resolution()               # LINEAR PROGRAMING
-    print_policy(policy, G.config.X, G.config.Y)
+    # filename = "Instances/impossible_to_win"
+    # filename = "Instances/example_grid"
+    # filename = "Instances/EASY_10_10"
+    filename = "Instances/MEDIUM_10_10"
+    # filename = "Instances/bridge_to_victory"
 
-    # if G.is_winnable():
-    #     G.play_with_policy(policy)
+    G = Game(filename)
+    if G.is_winnable():
+        mdp_solver = MDP_Solver(G.config)
+        # policy = mdp_solver.run_linear_programming_resolution()                   # LINEAR PROGRAMING
+        policy = mdp_solver.run_value_iteration(0.01)                               #VALUE ITERATION
+        # print_policy(policy, G.config.X, G.config.Y)
+        G.play_with_policy(policy)
+    else:
+        print ("Game can not be won!!!")
+                               # ITERATION VALUE
+
+
+    #
+
+    #
+

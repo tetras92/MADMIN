@@ -1,4 +1,5 @@
 import random
+from Parameters import *
 class Element():
 
     def __init__(self, configuration):
@@ -73,11 +74,12 @@ class C(Element):
     #     print("immediate death")
 
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
-        if has_treasure:
-            reward = 100
-        else :
-            reward = -200
-        return [((self.configuration.start_position, has_sword, has_key, has_treasure), 1.)], reward
+        # if has_treasure:
+        #     reward = 100
+        # else :                       #MAJ 23
+        reward = -100
+        # return [((self.configuration.start_position, has_sword, has_key, has_treasure), 1.)], reward
+        return [((self.configuration.start_position, False, False, False), 1.)], reward
 
 class E(Element):
 
@@ -89,7 +91,7 @@ class E(Element):
         if adventurer.has_sword:
             return
         random_value = random.random()
-        if random_value <= 0.7:
+        if random_value <= p_enemy:
             print("Adventurer is victorious")
         else:
             adventurer.die()
@@ -106,8 +108,9 @@ class E(Element):
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
         if not has_sword:
             reward = -1
-            return  [((self.configuration.start_position, has_sword, has_key, has_treasure), 0.3),
-                     (((from_x, from_y), has_sword, has_key, has_treasure), 0.7)], reward
+            # return  [((self.configuration.start_position, has_sword, has_key, has_treasure), 0.3),
+            return  [((self.configuration.start_position, False, False, False), 1 - p_enemy),
+                     (((from_x, from_y), has_sword, has_key, has_treasure), p_enemy)], reward
         else:
             reward = -1
             return [(((from_x, from_y), has_sword, has_key, has_treasure), 1.)], reward
@@ -232,9 +235,9 @@ class R(Element):
     def update(self, adventurer):
         Element.update(self, adventurer)
         random_value = random.random()
-        if random_value <= 0.1:
+        if random_value <= p_death_trap:
             adventurer.die()
-        elif random_value <= 0.4:
+        elif random_value <= p_death_trap + p_starting_position_trap:
             print("Back to the starting position (trap)")
             adventurer.position = self.configuration.start_position
         else:
@@ -258,8 +261,11 @@ class R(Element):
             reward = 40
         else:
             reward = -1
-        return  [((self.configuration.start_position, has_sword, has_key, has_treasure), 0.4),
-                 (((from_x, from_y), has_sword, has_key, has_treasure), 0.6)], reward
+        # return  [((self.configuration.start_position, has_sword, has_key, has_treasure), 0.4),
+        #          (((from_x, from_y), has_sword, has_key, has_treasure), 0.6)], reward                  #MAJ
+        return  [((self.configuration.start_position, has_sword, has_key, has_treasure), p_starting_position_trap),
+                 ((self.configuration.start_position, False, False, False), p_death_trap),
+                 (((from_x, from_y), has_sword, has_key, has_treasure), 1 - (p_death_trap + p_starting_position_trap))], reward
 
 class T(Element):
 
@@ -287,12 +293,12 @@ class T(Element):
     def get_list_dest_and_rewards(self,from_x, from_y, has_treasure, has_sword, has_key):
         if has_treasure:
             reward = -1
-            return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
+            return [(((from_x, from_y), has_sword, has_key, has_key), 1.)], reward
         elif has_key:
             reward = 100
             return [(((from_x, from_y), has_sword, has_key, True), 1.)], reward
         else:
-            reward = -1#0
+            reward = -1
             return [(((from_x, from_y), has_sword, has_key,  has_treasure), 1.)], reward
 
 class W(Element):

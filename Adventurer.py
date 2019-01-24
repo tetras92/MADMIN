@@ -18,5 +18,5 @@ class Adventurer:
     def die(self):
         print("Adventurer dies")
         self.position = self.configuration.start_position
-
+        self.configuration.reset()                               #AJOUTEE
         

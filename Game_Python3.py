@@ -3,10 +3,10 @@ from Case_Objects import *
 from Useful_methods import *
 import os
 import time
-# from getch import getch
+from getch import getch
 
 class Game:
-    
+
     def __init__(self, filename):
         self.config = self.load_game(filename)
 
@@ -16,8 +16,8 @@ class Game:
 
             print("Press z (up), q(right), s(down) or d(left)\n")
             print(">>> ")
-            # car = getch()
-            car = raw_input(">>> ")
+            car = getch()
+            # car = raw_input(">>> ")
             if car == "z":
                 self.config.Adventurer.move(Action.UP)
             elif car == "s":
@@ -99,8 +99,8 @@ class Game:
         return Game(".game")
 
 if __name__ == '__main__':
-    # filename = "Instances/example_grid"
-    filename = "Instances/EASY_10_10"
+    filename = "Instances/example_grid"
+    # filename = "Instances/EASY_10_10"
     # filename = "Instances/MEDIUM_10_10"
     # filename = "Instances/bridge_to_victory"
 

@@ -46,8 +46,6 @@ class QLearning_Solver():
 
         for possible_action in self.Q_table[state]:
             if best_action == None or self.Q_table[state][possible_action] > expected_reward_associated:
-                # if self.Q_table[state][possible_action] > expected_reward_associated:
-                #     print("ame")
                 best_action = possible_action
                 expected_reward_associated = self.Q_table[state][possible_action]
         return best_action
@@ -76,19 +74,25 @@ class QLearning_Solver():
             if self.QGame.has_won():
                 episode += 1
                 self.QGame.config.reset()
-            # time.sleep(1)
-            # self.QGame.show()
+
 
         policy = {state : self.best_action_from_state_policy(state) for state in self.Q_table}
-        # print(episode)
         return policy
 
 
 
 if __name__ == '__main__':
     filename = "Instances/example_grid"
+    # filename = "Instances/EASY_10_10"
+    # filename = "Instances/MEDIUM_10_10"
+    # filename = "Instances/bridge_to_victory"
+
     QL = QLearning_Solver(filename)
-    policy = QL.run_Q_learning()
-    print_policy(policy, QL.config.X, QL.config.Y)
-    # G = Game(filename)
-    # G.play_with_policy(policy)
+
+    G = Game(filename)
+    if G.is_winnable():
+        policy = QL.run_Q_learning()
+        print_policy(policy, QL.config.X, QL.config.Y)
+        G.play_with_policy(policy)
+    else:
+        print ("Game can not be won!!!")
